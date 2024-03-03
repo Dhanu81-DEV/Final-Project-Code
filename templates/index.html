@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leukemia Cell Detection</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>Leukemia Cell Detection</h1>
+    <form id="upload-form" action="/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".bmp,.jpg,.jpeg,.png">
+        <button type="submit">Predict</button>
+    </form>
+    <div id="result"></div>
+    <div id="processed-image"></div>
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById('result').innerText = data.result;
+            if (data.result === 'Leukemia (ALL)' || data.result === 'Normal') {
+                const imgTag = document.createElement('img');
+                imgTag.src = 'data:image/bmp;base64,' + data.processed_image;
+                document.getElementById('processed-image').innerHTML = '';
+                document.getElementById('processed-image').appendChild(imgTag);
+            } else {
+                document.getElementById('processed-image').innerHTML = '';
+            }
+
+        });
+    </script>
+</body>
+
+</html>
